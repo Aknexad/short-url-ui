@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { FormEvent, useMemo, useState } from "react";
+import { FormEvent, useMemo, useState } from 'react';
 
 type CreateShortUrlResponse = {
   shortUrl?: string;
@@ -10,25 +10,25 @@ type CreateShortUrlResponse = {
   slug?: string;
 };
 
-const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? "http://localhost:8080";
+const apiBaseUrl = process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:8080';
 
 export function ShortUrlForm() {
-  const [longUrl, setLongUrl] = useState("");
-  const [shortUrl, setShortUrl] = useState("");
-  const [error, setError] = useState("");
+  const [longUrl, setLongUrl] = useState('');
+  const [shortUrl, setShortUrl] = useState('');
+  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [isCopied, setIsCopied] = useState(false);
 
-  const endpoint = useMemo(() => `${apiBaseUrl.replace(/\/$/, "")}/`, []);
+  const endpoint = useMemo(() => `${apiBaseUrl.replace(/\/$/, '')}/`, []);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError("");
-    setShortUrl("");
+    setError('');
+    setShortUrl('');
     setIsCopied(false);
 
     if (!isValidUrl(longUrl)) {
-      setError("Please enter a valid URL, for example https://example.com/page.");
+      setError('Please enter a valid URL, for example https://example.com/page.');
       return;
     }
 
@@ -36,9 +36,9 @@ export function ShortUrlForm() {
 
     try {
       const response = await fetch(endpoint, {
-        method: "POST",
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ url: longUrl }),
       });
@@ -51,12 +51,14 @@ export function ShortUrlForm() {
       const nextShortUrl = normalizeShortUrl(data);
 
       if (!nextShortUrl) {
-        throw new Error("The API response did not include a short URL.");
+        throw new Error('The API response did not include a short URL.');
       }
 
       setShortUrl(nextShortUrl);
     } catch (requestError) {
-      setError(requestError instanceof Error ? requestError.message : "Something went wrong.");
+      setError(
+        requestError instanceof Error ? requestError.message : 'Something went wrong.',
+      );
     } finally {
       setIsLoading(false);
     }
@@ -74,16 +76,20 @@ export function ShortUrlForm() {
   return (
     <div className="rounded-[2rem] border border-white/80 bg-white/85 p-6 shadow-soft backdrop-blur sm:p-8 dark:border-white/10 dark:bg-slate-950/70 dark:shadow-black/30">
       <div className="mb-8">
-        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-300">Shortener</p>
-        <h2 className="mt-3 text-2xl font-bold text-slate-950 dark:text-white">Create a short URL</h2>
-        <p className="mt-2 text-sm leading-6 text-slate-500 dark:text-slate-400">
-          The form sends a POST request to <span className="font-mono text-slate-700 dark:text-slate-200">{endpoint}</span>.
+        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-blue-600 dark:text-blue-300">
+          Shortener
         </p>
+        <h2 className="mt-3 text-2xl font-bold text-slate-950 dark:text-white">
+          Create a short URL
+        </h2>
       </div>
 
       <form className="space-y-5" onSubmit={handleSubmit}>
         <div>
-          <label className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200" htmlFor="long-url">
+          <label
+            className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-200"
+            htmlFor="long-url"
+          >
             Destination URL
           </label>
           <input
@@ -107,13 +113,15 @@ export function ShortUrlForm() {
           disabled={isLoading}
           type="submit"
         >
-          {isLoading ? "Creating..." : "Create short URL"}
+          {isLoading ? 'Creating...' : 'Create short URL'}
         </button>
       </form>
 
       {shortUrl ? (
         <div className="mt-6 rounded-3xl border border-emerald-200 bg-emerald-50 p-4 dark:border-emerald-400/30 dark:bg-emerald-950/30">
-          <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">Your short link is ready</p>
+          <p className="text-sm font-medium text-emerald-800 dark:text-emerald-200">
+            Your short link is ready
+          </p>
           <div className="mt-3 flex flex-col gap-3 sm:flex-row">
             <a
               className="min-w-0 flex-1 truncate rounded-2xl bg-white px-4 py-3 font-mono text-sm text-slate-800 ring-1 ring-emerald-100 dark:bg-slate-900 dark:text-slate-100 dark:ring-emerald-400/20"
@@ -128,7 +136,7 @@ export function ShortUrlForm() {
               onClick={handleCopy}
               type="button"
             >
-              {isCopied ? "Copied" : "Copy"}
+              {isCopied ? 'Copied' : 'Copy'}
             </button>
           </div>
         </div>
@@ -140,7 +148,7 @@ export function ShortUrlForm() {
 function isValidUrl(value: string) {
   try {
     const parsedUrl = new URL(value);
-    return parsedUrl.protocol === "http:" || parsedUrl.protocol === "https:";
+    return parsedUrl.protocol === 'http:' || parsedUrl.protocol === 'https:';
   } catch {
     return false;
   }
@@ -156,8 +164,8 @@ function normalizeShortUrl(data: CreateShortUrlResponse) {
   const code = data.code ?? data.slug;
 
   if (!code) {
-    return "";
+    return '';
   }
 
-  return `${apiBaseUrl.replace(/\/$/, "")}/${code.replace(/^\//, "")}`;
+  return `${apiBaseUrl.replace(/\/$/, '')}/${code.replace(/^\//, '')}`;
 }
