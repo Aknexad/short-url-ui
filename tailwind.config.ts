@@ -1,11 +1,15 @@
-import type { Config } from "tailwindcss";
+import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  content: ["./app/**/*.{js,ts,jsx,tsx,mdx}", "./components/**/*.{js,ts,jsx,tsx,mdx}"],
+  content: [
+    './src/app/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/components/**/*.{js,ts,jsx,tsx,mdx}',
+    './src/pages/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
   theme: {
     extend: {
       boxShadow: {
-        soft: "0 20px 60px rgba(15, 23, 42, 0.12)",
+        soft: '0 20px 60px rgba(15, 23, 42, 0.12)',
       },
     },
   },
