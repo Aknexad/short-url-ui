@@ -5,7 +5,7 @@ import { ThemeToggle } from '@/components/theme-toggle';
 
 const navigationLinks = [
   { href: '/', label: 'Home' },
-  { href: '#about', label: 'About' },
+  { href: '/about/', label: 'About' },
   { href: '#dashboard', label: 'Dashboard' },
 ];
 
@@ -88,7 +88,7 @@ export default function Home() {
                 </Link>
                 <Link
                   className="rounded-full border border-slate-200 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:text-blue-600 dark:border-white/10 dark:bg-white/5 dark:text-slate-200 dark:hover:border-blue-300/40 dark:hover:text-blue-200"
-                  href="#about"
+                  href="about/"
                 >
                   Explore features
                 </Link>
