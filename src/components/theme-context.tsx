@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
+import { createContext, useContext, useEffect, useSyncExternalStore, type ReactNode } from 'react';
 
 type Theme = 'light' | 'dark';
 
@@ -11,40 +11,54 @@ interface ThemeContextType {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const getInitialTheme = (): Theme => {
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem('theme') as Theme | null;
-    if (stored) {
-      return stored;
-    }
-    if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-      return 'dark';
-    }
+const themeChangeEvent = 'themechange';
+
+const getPreferredTheme = (): Theme => {
+  const stored = localStorage.getItem('theme') as Theme | null;
+  if (stored === 'light' || stored === 'dark') {
+    return stored;
+  }
+  if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    return 'dark';
   }
   return 'light';
 };
 
+const getServerTheme = (): Theme => 'light';
+
+const setStoredTheme = (theme: Theme) => {
+  localStorage.setItem('theme', theme);
+  window.dispatchEvent(new Event(themeChangeEvent));
+};
+
+const subscribeToThemeChanges = (callback: () => void) => {
+  const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+
+  window.addEventListener(themeChangeEvent, callback);
+  window.addEventListener('storage', callback);
+  mediaQuery.addEventListener('change', callback);
+
+  return () => {
+    window.removeEventListener(themeChangeEvent, callback);
+    window.removeEventListener('storage', callback);
+    mediaQuery.removeEventListener('change', callback);
+  };
+};
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>(() => getInitialTheme());
-  const [mounted, setMounted] = useState(false);
+  const theme = useSyncExternalStore(subscribeToThemeChanges, getPreferredTheme, getServerTheme);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!mounted) return;
     const root = document.documentElement;
     if (theme === 'dark') {
       root.classList.add('dark');
     } else {
       root.classList.remove('dark');
     }
-    localStorage.setItem('theme', theme);
-  }, [theme, mounted]);
+  }, [theme]);
 
   const toggleTheme = () => {
-    setTheme(prev => (prev === 'dark' ? 'light' : 'dark'));
+    setStoredTheme(theme === 'dark' ? 'light' : 'dark');
   };
 
   return (
